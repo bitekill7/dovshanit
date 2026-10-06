@@ -1,3 +1,7 @@
+
+
+https://github.com/user-attachments/assets/081ff435-dcde-4d0f-a1dd-d54bc942dbc2
+
 # dovshanit
 הקוד הזה הוא לא כל הקוד של דובשנית אלא רק טעימה ממנו על מנת לראות את הלוגיקה הבסיסית שלה כדי שיהיה בטוח לשימוש בקרב משתמשים 
 נוצר עם ספריות phaser + electron 
