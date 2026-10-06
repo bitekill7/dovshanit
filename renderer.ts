@@ -16,7 +16,8 @@ import { SettingsStore } from './SettingsStore'
 import { Speaker } from './Speaker'
 import { BUNNY_TEXTURE_KEY, DRAG_X, GRAVITY_Y, MAX_FLEE_SPEED } from './constants'
 import { closeApp, computeFloorY } from './platform'
-import { greetingPhrases } from './phrases'
+import { greetingPhrases, type Category } from './phrases'
+import { Feelings } from './Feelings'
 import { CreditsPanel } from './CreditsPanel'
 /* ============================================================
  *  הסצנה: רק מחברת בין המודולים. כל ההתנהגויות חיות בקבצים שלהן.
@@ -40,6 +41,7 @@ class DovshanitScene extends Phaser.Scene {
   private sleep!: Sleep
   private drag!: DragController
   private brain!: Brain
+  private feelings!: Feelings
 
   constructor() {
     super('DovshanitScene')
@@ -117,6 +119,8 @@ class DovshanitScene extends Phaser.Scene {
 
     this.bunny = new Bunny(this, this.settings, this.stage)
     this.speaker = new Speaker(this, this.bunny, this.settings, this.stage)
+    this.feelings = new Feelings(this, this.bunny, this.stage, this.speaker)
+    this.speaker.onEvent = category => this.feelings.react(category)
     this.interaction = new Interaction(this, this.speaker)
     this.boxes = new BoxManager(this, this.bunny, this.stage, this.speaker, this.menu)
     this.physics.add.collider(this.bunny.sprite, this.boxes.group)
@@ -162,6 +166,7 @@ class DovshanitScene extends Phaser.Scene {
     )
     
     this.pet = new Petting({
+      feelings: this.feelings,
       scene: this,
       bunny: this.bunny,
       settings: this.settings,
@@ -185,7 +190,8 @@ class DovshanitScene extends Phaser.Scene {
       sleep: this.sleep,
       attention,
       ball: this.ball,
-      pet: this.pet
+      pet: this.pet,
+      feelings: this.feelings
     })
 
     // קופסאות -> ניווט וגזרים
@@ -262,6 +268,7 @@ class DovshanitScene extends Phaser.Scene {
     this.ball.updateHeld(delta)
     this.ball.update(now, delta)
     this.pet.update(now, delta)
+    this.feelings.update(now, delta)
 
     switch (this.bunny.state) {
       case 'dragging':
@@ -285,16 +292,16 @@ class DovshanitScene extends Phaser.Scene {
 
   private mainMenuActions(): MenuAction[] {
     const actions: MenuAction[] = [
-      { label: 'הבא לכאן (איפוס מיקום)', onSelect: () => this.resetPosition() },
-      { label: 'תגידי משהו', onSelect: () => this.speaker.say('random', true) },
-      { label: 'קרדיטים 📜', onSelect: () => this.creditsPanel?.show() },
-      { label: 'הוסף קופסה 📦', onSelect: () => this.boxes.add() },
-      { label: 'הוסף גזר 🥕', onSelect: () => this.carrots.addFromMenu() },
-      { label: this.ball.exists ? 'הסר כדור' : 'הוסף כדור ⚽', onSelect: () => this.ball.toggle() },
-      { label: 'הגדרות ⚙️', onSelect: () => this.settingsPanel?.show() }
+      { label: 'הבא לכאן (איפוס מיקום)', onHover: this.hoverReaction('hoverReset'), onSelect: () => this.resetPosition() },
+      { label: 'תגידי משהו', onHover: this.hoverReaction('hoverSay'), onSelect: () => this.speaker.say('random', true) },
+      { label: 'קרדיטים 📜', onHover: this.hoverReaction('hoverCredits'), onSelect: () => this.creditsPanel?.show() },
+      { label: 'הוסף קופסה 📦', onHover: this.hoverReaction('hoverBox'), onSelect: () => this.boxes.add() },
+      { label: 'הוסף גזר 🥕', onHover: this.hoverReaction('hoverCarrot'), onSelect: () => this.carrots.addFromMenu() },
+      { label: this.ball.exists ? 'הסר כדור' : 'הוסף כדור ⚽', onHover: this.hoverReaction(this.ball.exists ? 'hoverBallRemove' : 'hoverBallAdd'), onSelect: () => this.ball.toggle() },
+      { label: 'הגדרות ⚙️', onHover: this.hoverReaction('hoverSettings'), onSelect: () => this.settingsPanel?.show() }
     ]
     if (this.boxes.list.length > 0) {
-      actions.push({ label: 'הסר את כל הקופסאות', onSelect: () => this.boxes.removeAll() })
+      actions.push({ label: 'הסר את כל הקופסאות', onHover: this.hoverReaction('hoverRemoveBoxes'), onSelect: () => this.boxes.removeAll() })
     }
     actions.push({
       label: 'סגור דובשנית',
@@ -324,6 +331,14 @@ class DovshanitScene extends Phaser.Scene {
     this.nav.clearRoute()
     this.bunny.endLeap()
     this.bunny.body.setVelocityX(0)
+  }
+
+  /** תגובה בדיבור כשהסמן מרחף על כפתור בתפריט (לא כשהיא ישנה או מפחדת). */
+  private hoverReaction(category: Category): () => void {
+    return () => {
+      if (this.bunny.sleeping || this.bunny.fearing) return
+      this.speaker.say(category)
+    }
   }
 
   private applySettings(): void {

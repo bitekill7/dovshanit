@@ -14,6 +14,7 @@ import {
 } from './constants'
 import type { Bunny } from './Bunny'
 import type { CarrotManager } from './Carrots'
+import type { Feelings } from './Feelings'
 import type { Interaction } from './Moods'
 import type { Navigator } from './Navigator'
 import type { SettingsStore } from './SettingsStore'
@@ -62,6 +63,7 @@ export interface PettingDeps {
   speaker: Speaker
   interaction: Interaction
   carrots: CarrotManager
+  feelings: Feelings
   nav: Navigator
 }
 
@@ -103,7 +105,7 @@ export class Petting {
 
   /** נקרא כל פריים, לפני ההתנהגות החופשית. */
   update(now: number, delta: number): void {
-    const { scene, bunny, settings, interaction, carrots } = this.d
+    const { scene, bunny, settings, interaction, carrots, feelings } = this.d
     const pointer = scene.input.activePointer
 
     // מהירות הסמן
@@ -124,6 +126,7 @@ export class Petting {
 
     const unavailable =
       !settings.get().petEnabled ||
+      !feelings.allowsPetting() ||
       !interaction.pointerSeen ||
       bunny.dragging ||
       bunny.fearing ||

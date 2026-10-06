@@ -10,6 +10,9 @@ export type Category =
   | 'attention' | 'attentionFlip' | 'attentionDance' | 'noticed'
   | 'petStart' | 'petPleasant' | 'petTickle' | 'petEnd'
   | 'ballAdded' | 'ballRemoved' | 'ballKick' | 'ballHeader' | 'ballOffered' | 'ballBored'
+  | 'moodShift'
+  | 'hoverReset' | 'hoverSay' | 'hoverCredits' | 'hoverBox' | 'hoverCarrot'
+  | 'hoverBallAdd' | 'hoverBallRemove' | 'hoverSettings' | 'hoverRemoveBoxes'
 
 export interface SpeechRule {
   phrases: readonly string[]
@@ -105,5 +108,25 @@ export const SPEECH: Record<Category, SpeechRule> = {
   ballHeader: { phrases: ['נגיחה!', 'ישר מהראש!', 'איזו נגיחה!'], cooldown: 3500 },
   ballOffered: { phrases: ['תזרוק לי אותו!', 'אני פנויה, תמסור!', 'אל תחזיק אותו רק לעצמך!'], cooldown: 0 },
   ballBored: { phrases: ['נמאס לי מהכדור... בינתיים.', 'אני צריכה הפסקה.', 'אוף, אף אחד לא זורק לי.'], cooldown: 0 },
+  moodShift: { phrases: [], cooldown: 0 },
+  hoverReset: { phrases: ['מה, מעבירים אותי למרכז?', 'אל תזרוק אותי באמצע המסך!', 'טלפורטציה? אני מוכנה!'], cooldown: 3000 },
+  hoverSay: { phrases: ['רוצה שאדבר? יש לי המון מה לומר!', 'סוף סוף מישהו מתעניין בדעה שלי!', 'אני מוכנה לשיחה!'], cooldown: 3000 },
+  hoverCredits: { phrases: ['קרדיטים? תזכיר להם שאני הכוכבת!', 'וואו, אני מפורסמת!', 'אל תשכח לציין את הגזרים!'], cooldown: 3000 },
+  hoverBox: { phrases: ['קופסה חדשה? אני מתרגשת!', 'כן, כן, עוד קופסה!', 'אני כבר מתכננת איך לטפס עליה!'], cooldown: 3000 },
+  hoverCarrot: { phrases: ['גזר?! תלחץ, תלחץ!', 'ריח של גזר באוויר...', 'הבטן שלי כבר מקרקרת!'], cooldown: 3000 },
+  hoverBallAdd: { phrases: ['כדור! תלחץ כבר!', 'בוא נשחק!', 'אני מוכנה לנגיחה!'], cooldown: 3000 },
+  hoverBallRemove: { phrases: ['מה, לוקחים לי את הכדור?', 'אל תיקח אותו, היינו באמצע משחק!', 'עוד קצת לשחק, בבקשה?'], cooldown: 3000 },
+  hoverSettings: { phrases: ['הגדרות? אל תשנה לי את האופי!', 'רק בלי לעשות ממני רובוט.', 'מה אתה רוצה לשפר בי?'], cooldown: 3000 },
+  hoverRemoveBoxes: { phrases: ['לא! הקופסאות שלי!', 'אל תהרוס את הבית שלי!', 'מה עשו לך הקופסאות?'], cooldown: 3000 },
   noticed: { phrases: ['סוף סוף שמת לב אליי!', 'הצלחתי! אתה מסתכל!', 'ידעתי שתיכנע בסוף.'], cooldown: 0 }
+}
+
+
+/** משפטים במעבר בין רמות מצב רוח (נבחרים ב-Feelings). */
+export const MOOD_SHIFT: Record<'angry' | 'upset' | 'recovered' | 'happy' | 'joyful', readonly string[]> = {
+  angry: ['אני כועסת עליך, תדע לך!', 'נמאס לי! די כבר!', 'אני לא מדברת איתך עכשיו.'],
+  upset: ['אני קצת עצובה...', 'לא מרגישה מי יודע מה.', 'יש לי מצב רוח מבואס.'],
+  recovered: ['טוב, אני כבר מרגישה יותר טוב.', 'אוקיי, אני מוכנה לסלוח.', 'אפשר להתחיל מחדש?'],
+  happy: ['אני במצב רוח מעולה!', 'איזה יום נהדר!', 'אני מרגישה טוב היום!'],
+  joyful: ['אני הדובשנית הכי מאושרת בעולם!', 'הכל מושלם!', 'אני פשוט מתפוצצת משמחה!']
 }

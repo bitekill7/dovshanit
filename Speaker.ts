@@ -13,6 +13,9 @@ export class Speaker {
   private readonly stage: Stage
   private readonly settings: SettingsStore
 
+  /** נחבר מבחוץ: מדווח על כל אירוע דיבור שעבר קירור (גם כשהדיבור כבוי), למשל למצב הרוח. */
+  onEvent: (category: Category) => void = () => {}
+
   private lastAnySpeech = -Infinity
   private readonly lastSpeech: Partial<Record<Category, number>> = {}
   private readonly lastPhrase: Partial<Record<Category, string>> = {}
@@ -25,7 +28,6 @@ export class Speaker {
   }
 
   say(category: Category, force = false, pool?: readonly string[]): void {
-    if (!this.settings.get().speechEnabled) return
     const now = this.scene.time.now
     const rule = SPEECH[category]
 
@@ -36,6 +38,9 @@ export class Speaker {
 
     this.lastAnySpeech = now
     this.lastSpeech[category] = now
+    this.onEvent(category)
+
+    if (!this.settings.get().speechEnabled) return
     this.showBubble(this.pickPhrase(category, pool ?? rule.phrases))
   }
 

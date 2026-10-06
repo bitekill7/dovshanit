@@ -13,6 +13,7 @@ import type { Bunny, Stage } from './Bunny'
 import type { Ball } from './Ball'
 import type { BoxManager } from './Boxes'
 import type { CarrotManager } from './Carrots'
+import type { Feelings } from './Feelings'
 import type { Attention, Interaction, Sleep } from './Moods'
 import type { Navigator } from './Navigator'
 import type { Petting } from './Petting'
@@ -33,6 +34,7 @@ export interface BrainDeps {
   attention: Attention
   ball: Ball
   pet: Petting
+  feelings: Feelings
 }
 
 /* ============================================================
@@ -50,7 +52,8 @@ export class Brain {
 
   /** כל פריים שבו המשתמש לא גורר את הדמות. */
   updateFree(now: number, dt: number): void {
-    const { scene, bunny, stage, settings, speaker, interaction, carrots, nav, sleep, ball, pet } = this.d
+    const { scene, bunny, stage, settings, speaker, interaction, carrots, nav, sleep, ball, pet, feelings } = this.d
+    const repelRadius = REPEL_RADIUS * feelings.fleeScale()
     const body = bunny.body
     const pointer = scene.input.activePointer
     const c = body.center
@@ -78,8 +81,8 @@ export class Brain {
     ball.steer(now)
 
     // בורחת מהעכבר, אלא אם המשתמש מחזיק גזר (אז היא באה אליו)
-    if (settings.get().fleeMouseEnabled && !bunny.leaping && !carrots.held && !pet.suppressesFlee && pointerDist < REPEL_RADIUS) {
-      const force = (REPEL_RADIUS - pointerDist) / REPEL_RADIUS
+    if (settings.get().fleeMouseEnabled && !bunny.leaping && !carrots.held && !pet.suppressesFlee && pointerDist < repelRadius) {
+      const force = (repelRadius - pointerDist) / repelRadius
       const direction = c.x < pointer.x ? -1 : 1
       const panic = now < bunny.dizzyUntil ? 0.4 : 1
 
@@ -112,7 +115,7 @@ export class Brain {
   }
 
   private think(): void {
-    const { scene, bunny, settings, speaker, interaction, boxes, carrots, nav, sleep, attention, ball, pet } = this.d
+    const { scene, bunny, settings, speaker, interaction, boxes, carrots, nav, sleep, attention, ball, pet, feelings } = this.d
     if (pet.active || bunny.dragging || bunny.fearing || bunny.sleeping || carrots.items.length > 0 || nav.goal || !bunny.isGrounded()) return
     if (ball.playing(scene.time.now)) return // באמצע משחק: לא מפריעים לה במחשבות אקראיות
     const now = scene.time.now
@@ -162,7 +165,8 @@ export class Brain {
     const roll = Math.random()
     if (roll < 0.8) {
       const dir = roll < 0.4 ? 1 : -1
-      body.setVelocityX(dir * Phaser.Math.Between(Math.max(50, s.walkSpeed * 0.7), s.walkSpeed))
+      const walk = s.walkSpeed * feelings.walkScale()
+      body.setVelocityX(dir * Phaser.Math.Between(walk * 0.7, walk))
       body.setVelocityY(bunny.jumpVelocity(0.16, 300))
     } else {
       body.setVelocityX(0)
