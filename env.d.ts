@@ -13,5 +13,7 @@ interface Window {
   electron: {
     setIgnoreMouseEvents: (ignore: boolean) => void
     closeApp: () => void
+    /** אופציונלי: יוצר קובץ טקסט בתיקייה ייעודית. אם חסר, מצב מפלצת מציג את הפתק על המסך. */
+    writeNoteFile?: (name: string, text: string) => Promise<boolean>
   }
 }

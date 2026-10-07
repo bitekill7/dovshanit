@@ -5,7 +5,7 @@ import type { Speaker } from './Speaker'
 
 /* ============================================================
  *  מצב רוח: מספר אחד (0..100) שעולה מדברים טובים ויורד מדברים רעים,
- *  וחוזר לאט לבסיס. הרמה הנוכחית משפיעה על התנהגות (בריחה, מהירות, ליטוף)
+ *  וחוזר לאט לבסיס. הרמה הנוכחית משפיעה על התנהגות (בריחה, מהירות)
  *  ועל מה שרואים: הילה, אימוג'ים מעל הראש ומד קצר שמופיע ונעלם לאט.
  * ============================================================ */
 
@@ -20,6 +20,7 @@ const PET_GAIN_PER_SEC = 4
 const MIN_VISIBLE_CHANGE = 2 // שינוי קטן מזה לא מקפיץ את המד
 const GAUGE_HOLD_MS = 3200
 const SHIFT_SPEECH_GAP_MS = 12000
+const AURA_MS = 3000 // ההילה נשארת רק כמה שניות אחרי המעבר לרמה
 
 function levelOf(value: number): MoodLevel {
   if (value < 20) return 'angry'
@@ -159,6 +160,7 @@ export class Feelings {
   private gaugeUntil = 0
   private nextSignAt = 0
   private lastShiftSpeechAt = -Infinity
+  private auraUntil = 0
 
   constructor(scene: Phaser.Scene, bunny: Bunny, stage: Stage, speaker: Speaker) {
     this.scene = scene
@@ -191,9 +193,8 @@ export class Feelings {
     return PROFILES[this.level].walk
   }
 
-  /** כועסת: לא מרשה ללטף אותה עד שתירגע. */
-  allowsPetting(): boolean {
-    return this.level !== 'angry'
+  get mood(): MoodLevel {
+    return this.level
   }
 
   /* ---------------- אירועים ---------------- */
@@ -218,6 +219,7 @@ export class Feelings {
     const prev = this.level
     this.level = next
     this.face.setText(PROFILES[next].face)
+    this.auraUntil = this.scene.time.now + AURA_MS
     this.reveal()
     this.announceShift(prev, next)
   }
@@ -267,7 +269,8 @@ export class Feelings {
     if (profile) {
       for (let i = 0; i < 3; i++) this.auraRgb[i] += (profile.rgb[i] - this.auraRgb[i]) * k
     }
-    this.auraAlpha += ((profile?.alpha ?? 0) - this.auraAlpha) * k
+    const target = profile && now < this.auraUntil ? profile.alpha : 0
+    this.auraAlpha += (target - this.auraAlpha) * (1 - Math.exp(-delta / (target > this.auraAlpha ? 500 : 350)))
 
     if (this.auraAlpha < 0.005) {
       this.aura.setVisible(false)

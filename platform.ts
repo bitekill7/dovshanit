@@ -31,3 +31,15 @@ export function computeFloorY(): number {
   }
   return winH - TASKBAR_FALLBACK_OFFSET
 }
+
+
+/** כותב קובץ טקסט דרך Electron (אם הגשר קיים). false = לא נכתב, והקורא אחראי על חלופה. */
+export async function writeNoteFile(name: string, text: string): Promise<boolean> {
+  const write = window.electron.writeNoteFile
+  if (!write) return false
+  try {
+    return await write(name, text)
+  } catch {
+    return false
+  }
+}

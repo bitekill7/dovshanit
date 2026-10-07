@@ -241,6 +241,8 @@ export class SettingsPanel {
     this.addToggle('fleeMouseEnabled', 'בריחה מהסמן כשהוא מתקרב')
     this.addToggle('petEnabled', 'ליטוף עדין עם הסמן (היא נרגעת ונהנית)')
 
+    this.addToggle('monsterMode', 'מצב מפלצת (מפחיד כשהיא כועסת, חמוד כשהיא מאושרת)')
+
     const actions = document.createElement('div')
     Object.assign(actions.style, { display: 'flex', gap: '8px', marginTop: '14px' })
 

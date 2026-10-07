@@ -18,6 +18,7 @@ import { BUNNY_TEXTURE_KEY, DRAG_X, GRAVITY_Y, MAX_FLEE_SPEED } from './constant
 import { closeApp, computeFloorY } from './platform'
 import { greetingPhrases, type Category } from './phrases'
 import { Feelings } from './Feelings'
+import { MonsterMode } from './Monster'
 import { CreditsPanel } from './CreditsPanel'
 /* ============================================================
  *  הסצנה: רק מחברת בין המודולים. כל ההתנהגויות חיות בקבצים שלהן.
@@ -42,6 +43,7 @@ class DovshanitScene extends Phaser.Scene {
   private drag!: DragController
   private brain!: Brain
   private feelings!: Feelings
+  private monster!: MonsterMode
 
   constructor() {
     super('DovshanitScene')
@@ -122,6 +124,15 @@ class DovshanitScene extends Phaser.Scene {
     this.feelings = new Feelings(this, this.bunny, this.stage, this.speaker)
     this.speaker.onEvent = category => this.feelings.react(category)
     this.interaction = new Interaction(this, this.speaker)
+    this.monster = new MonsterMode({
+      scene: this,
+      bunny: this.bunny,
+      stage: this.stage,
+      settings: this.settings,
+      speaker: this.speaker,
+      interaction: this.interaction,
+      feelings: this.feelings
+    })
     this.boxes = new BoxManager(this, this.bunny, this.stage, this.speaker, this.menu)
     this.physics.add.collider(this.bunny.sprite, this.boxes.group)
 
@@ -269,6 +280,7 @@ class DovshanitScene extends Phaser.Scene {
     this.ball.update(now, delta)
     this.pet.update(now, delta)
     this.feelings.update(now, delta)
+    this.monster.update(now)
 
     switch (this.bunny.state) {
       case 'dragging':

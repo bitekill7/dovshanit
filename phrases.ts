@@ -10,7 +10,7 @@ export type Category =
   | 'attention' | 'attentionFlip' | 'attentionDance' | 'noticed'
   | 'petStart' | 'petPleasant' | 'petTickle' | 'petEnd'
   | 'ballAdded' | 'ballRemoved' | 'ballKick' | 'ballHeader' | 'ballOffered' | 'ballBored'
-  | 'moodShift'
+  | 'moodShift' | 'monsterTaunt' | 'cuteAct'
   | 'hoverReset' | 'hoverSay' | 'hoverCredits' | 'hoverBox' | 'hoverCarrot'
   | 'hoverBallAdd' | 'hoverBallRemove' | 'hoverSettings' | 'hoverRemoveBoxes'
 
@@ -109,6 +109,11 @@ export const SPEECH: Record<Category, SpeechRule> = {
   ballOffered: { phrases: ['תזרוק לי אותו!', 'אני פנויה, תמסור!', 'אל תחזיק אותו רק לעצמך!'], cooldown: 0 },
   ballBored: { phrases: ['נמאס לי מהכדור... בינתיים.', 'אני צריכה הפסקה.', 'אוף, אף אחד לא זורק לי.'], cooldown: 0 },
   moodShift: { phrases: [], cooldown: 0 },
+  monsterTaunt: {
+    phrases: ['אני רואה אותך...', 'אתה לא לבד בחדר הזה.', 'למה הפסקת להסתכל עליי?', 'אני יודעת איפה הכפתור "סגור". ואני זוכרת.', 'אני לא שוכחת. אף פעם.'],
+    cooldown: 0
+  },
+  cuteAct: { phrases: ['שלחתי לך נשיקה!', 'אתה הכי טוב בעולם!', 'יום כזה צריך לחגוג!', 'אני כל כך שמחה!'], cooldown: 0 },
   hoverReset: { phrases: ['מה, מעבירים אותי למרכז?', 'אל תזרוק אותי באמצע המסך!', 'טלפורטציה? אני מוכנה!'], cooldown: 3000 },
   hoverSay: { phrases: ['רוצה שאדבר? יש לי המון מה לומר!', 'סוף סוף מישהו מתעניין בדעה שלי!', 'אני מוכנה לשיחה!'], cooldown: 3000 },
   hoverCredits: { phrases: ['קרדיטים? תזכיר להם שאני הכוכבת!', 'וואו, אני מפורסמת!', 'אל תשכח לציין את הגזרים!'], cooldown: 3000 },

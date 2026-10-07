@@ -105,7 +105,7 @@ export class Petting {
 
   /** נקרא כל פריים, לפני ההתנהגות החופשית. */
   update(now: number, delta: number): void {
-    const { scene, bunny, settings, interaction, carrots, feelings } = this.d
+    const { scene, bunny, settings, interaction, carrots } = this.d
     const pointer = scene.input.activePointer
 
     // מהירות הסמן
@@ -126,7 +126,6 @@ export class Petting {
 
     const unavailable =
       !settings.get().petEnabled ||
-      !feelings.allowsPetting() ||
       !interaction.pointerSeen ||
       bunny.dragging ||
       bunny.fearing ||
@@ -184,7 +183,8 @@ export class Petting {
   /* ---------------- רוגע: סמן איטי וקרוב = אין סיבה לברוח ---------------- */
 
   private updateCalm(now: number, dist: number): void {
-    if (dist >= REPEL_RADIUS * 1.3) {
+    // כועסת/עצובה בורחת מרדיוס גדול יותר, אז גם אזור ההרגעה גדל איתו (אחרת לא ניתן להרגיע אותה)
+    if (dist >= REPEL_RADIUS * Math.max(1, this.d.feelings.fleeScale()) * 1.3) {
       this.calm = false
       this.slowSince = 0
       return

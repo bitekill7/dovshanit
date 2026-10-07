@@ -17,6 +17,7 @@ export interface DovshanitSettings {
   smartParkourEnabled: boolean
   fleeMouseEnabled: boolean
   petEnabled: boolean
+  monsterMode: boolean
 }
 
 export type SettingsKey = keyof DovshanitSettings
@@ -54,7 +55,8 @@ export const DEFAULT_SETTINGS: Readonly<DovshanitSettings> = {
   hungerEnabled: true,
   smartParkourEnabled: true,
   fleeMouseEnabled: true,
-  petEnabled: true
+  petEnabled: true,
+  monsterMode: false
 }
 
 function clampSettingValue(key: SettingsKey, value: unknown): number | boolean {
